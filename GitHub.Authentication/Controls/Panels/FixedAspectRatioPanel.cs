@@ -1,7 +1,33 @@
-﻿using System;
+﻿/**** Git Credential Manager for Windows ****
+ *
+ * Copyright (c) GitHub Corporation
+ * All rights reserved.
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the """"Software""""), to deal
+ * in the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+ * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+**/
+
+using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using GitHub.Shared.Converters;
 
 namespace GitHub.UI
 {
@@ -40,16 +66,19 @@ namespace GitHub.UI
             set { SetValue(Control.VerticalContentAlignmentProperty, value); }
         }
 
-        static Size GetMaxSize(Size availableSize, double constraintAspectRatio)
+        private static Size GetMaxSize(Size availableSize, double constraintAspectRatio)
         {
             double h = availableSize.Height;
             double w = availableSize.Width;
 
             var availableAspectRatio = w / h;
 
-            if(constraintAspectRatio >= availableAspectRatio) {
+            if (constraintAspectRatio >= availableAspectRatio)
+            {
                 h = w / constraintAspectRatio;
-            } else {
+            }
+            else
+            {
                 w = h * constraintAspectRatio;
             }
 
@@ -88,7 +117,7 @@ namespace GitHub.UI
             return finalSize;
         }
 
-        static Point GetPosition(Size outer, Size inner, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment)
+        private static Point GetPosition(Size outer, Size inner, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment)
         {
             double x = 0;
             double y = 0;
@@ -99,6 +128,7 @@ namespace GitHub.UI
                 case HorizontalAlignment.Center:
                     x = outer.Width / 2 - inner.Width / 2;
                     break;
+
                 case HorizontalAlignment.Right:
                     x = outer.Width - inner.Width;
                     break;
@@ -110,6 +140,7 @@ namespace GitHub.UI
                 case VerticalAlignment.Center:
                     y = outer.Height / 2 - inner.Height / 2;
                     break;
+
                 case VerticalAlignment.Bottom:
                     x = outer.Height - inner.Height;
                     break;

@@ -1,9 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.Net.Compilers.2.3.2\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.2.3.2\build\Microsoft.Net.Compilers.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{CF306116-BBF0-4CC7-AFCE-A506AC4752CB}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -15,6 +14,12 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -25,6 +30,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,6 +40,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>..\analysisRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -57,12 +64,27 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Authcode.cs" />
-    <Compile Include="Helpers\ActionCommand.cs" />
+    <Compile Include="AuthenticationPrompts.cs" />
+    <Compile Include="Controls\CredentialsControl.xaml.cs">
+      <DependentUpon>CredentialsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Text\ValidationMessage.cs" />
+    <Compile Include="CredentialsWindow.xaml.cs">
+      <DependentUpon>CredentialsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Authentication.cs" />
+    <Compile Include="AuthenticationResult.cs" />
+    <Compile Include="Authority.cs" />
+    <Compile Include="TokenScope.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Helpers\BindingProxy.cs" />
-    <Compile Include="Helpers\HyperLinkCommand.cs" />
+    <Compile Include="IAuthentication.cs" />
+    <Compile Include="IAuthority.cs" />
+    <Compile Include="Tester.xaml.cs">
+      <DependentUpon>Tester.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\CredentialsViewModel.cs" />
     <Compile Include="ViewModels\TwoFactorViewModel.cs" />
-    <Compile Include="ViewModels\ViewModel.cs" />
     <Page Include="AppResources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -75,9 +97,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Assets\ValidationMessage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Buttons\OcticonCircleButton.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\CredentialsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\HorizontalShadowDivider.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -92,6 +122,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\TwoFactorInput.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CredentialsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tester.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -122,13 +160,6 @@
     <Compile Include="Controls\TwoFactorInput.xaml.cs">
       <DependentUpon>TwoFactorInput.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Converters\AspectRatioConverter.cs" />
-    <Compile Include="Converters\BooleanToHiddenVisibilityConverter.cs" />
-    <Compile Include="Converters\BooleanToInverseHiddenVisibilityConverter.cs" />
-    <Compile Include="Converters\ThicknessConverter.cs" />
-    <Compile Include="Converters\ValueConverterMarkupExtension.cs" />
-    <Compile Include="Helpers\AccessKeysManagerScoping.cs" />
-    <Compile Include="Helpers\FocusHelper.cs" />
     <Compile Include="Octicon.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -159,6 +190,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -173,9 +205,40 @@
       <Project>{c1daabc1-b493-459d-bb4f-04fbefb1ba13}</Project>
       <Name>Microsoft.Alm.Authentication</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Alm.Git\Microsoft.Alm.Git.csproj">
+      <Project>{4827c16d-5c58-406d-ab3f-3700bb0d06fe}</Project>
+      <Name>Microsoft.Alm.Git</Name>
+    </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\octocat-mark.ico" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="..\Gui-Shared\Gui-Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <PropertyGroup>
+    <PostBuildEvent>
+SET dst=$(SolutionDir)Deploy\
+SET src=$(TargetDir)
+
+IF NOT EXIST "%25dst%25" MKDIR "%25dst%25"
+
+COPY /V /Y "$(SolutionDir)LICENSE.txt" "%25src%25LICENSE.txt"
+COPY /V /Y "$(SolutionDir)README.md" "%25src%25README.md"
+COPY /V /Y "%25src%25Microsoft.Alm.Git.dll" "%25dst%25Microsoft.Alm.Git.dll"
+COPY /V /Y "%25src%25Microsoft.Alm.Authentication.dll" "%25dst%25Microsoft.Alm.Authentication.dll"
+COPY /V /Y "%25src%25GitHub.Authentication.exe" "%25dst%25GitHub.Authentication.exe"
+COPY /V /Y "%25src%25README.md" "%25dst%25README.md"
+COPY /V /Y "%25src%25LICENSE.txt" "%25dst%25LICENSE.txt"
+    </PostBuildEvent>
+  </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.2.3.2\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.2.3.2\build\Microsoft.Net.Compilers.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

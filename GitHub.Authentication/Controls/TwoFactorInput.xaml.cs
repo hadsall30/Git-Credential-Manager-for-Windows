@@ -1,11 +1,37 @@
-﻿using System;
+﻿/**** Git Credential Manager for Windows ****
+ *
+ * Copyright (c) GitHub Corporation
+ * All rights reserved.
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the """"Software""""), to deal
+ * in the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+ * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+**/
+
+using System;
+using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using GitHub.Extensions;
-using System.Globalization;
-using System.Threading.Tasks;
+using GitHub.Shared.Converters;
+using GitHub.Shared.Helpers;
 
 namespace GitHub.UI
 {
@@ -23,9 +49,9 @@ namespace GitHub.UI
     public partial class TwoFactorInput : UserControl
     {
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof(string), typeof(TwoFactorInput), new PropertyMetadata(""));
+            DependencyProperty.Register(nameof(Text), typeof(string), typeof(TwoFactorInput), new PropertyMetadata(""));
 
-        TextBox[] TextBoxes;
+        private TextBox[] TextBoxes;
         public TextBox TextBox { get { return TextBoxes[0]; } }
 
         public TwoFactorInput()
@@ -42,7 +68,7 @@ namespace GitHub.UI
                 six
             };
 
-            foreach(var textBox in TextBoxes)
+            foreach (var textBox in TextBoxes)
             {
                 SetupTextBox(textBox);
             }
@@ -64,9 +90,9 @@ namespace GitHub.UI
             SetText(text);
         }
 
-        void SetText(string text)
+        private void SetText(string text)
         {
-            if (String.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty(text))
             {
                 foreach (var textBox in TextBoxes)
                 {
@@ -80,7 +106,7 @@ namespace GitHub.UI
             {
                 TextBoxes[i].Text = digits[i].ToString();
             }
-            SetValue(TextProperty, String.Join("", digits));
+            SetValue(TextProperty, string.Join("", digits));
         }
 
         public string Text
@@ -139,33 +165,33 @@ namespace GitHub.UI
 
             textBox.SelectionChanged += (sender, args) =>
             {
-                // Make sure we can't insert additional text into a textbox.
-                // Each textbox should only allow one character.
+                // Make sure we can't insert additional text into a textbox. Each textbox should only
+                // allow one character.
                 if (textBox.SelectionLength == 0 && textBox.Text.Any())
                 {
                     textBox.SelectAll();
                 }
             };
-            
+
             textBox.TextChanged += (sender, args) =>
             {
-                SetValue(TextProperty, String.Join("", GetTwoFactorCode()));
+                SetValue(TextProperty, string.Join("", GetTwoFactorCode()));
                 var change = args.Changes.FirstOrDefault();
                 args.Handled = (change != null && change.AddedLength > 0) && MoveNext();
             };
         }
 
-        static bool MoveNext()
+        private static bool MoveNext()
         {
             return MoveFocus(FocusNavigationDirection.Next);
         }
 
-        static bool MovePrevious()
+        private static bool MovePrevious()
         {
             return MoveFocus(FocusNavigationDirection.Previous);
         }
 
-        static bool MoveFocus(FocusNavigationDirection navigationDirection)
+        private static bool MoveFocus(FocusNavigationDirection navigationDirection)
         {
             var traversalRequest = new TraversalRequest(navigationDirection);
             var keyboardFocus = Keyboard.FocusedElement as UIElement;
@@ -179,12 +205,12 @@ namespace GitHub.UI
 
         private static string GetTextBoxValue(TextBox textBox)
         {
-            return String.IsNullOrEmpty(textBox.Text) ? " " : textBox.Text;
+            return string.IsNullOrEmpty(textBox.Text) ? " " : textBox.Text;
         }
 
         private string GetTwoFactorCode()
         {
-            return String.Join("", TextBoxes.Select(textBox => textBox.Text));
+            return string.Join("", TextBoxes.Select(textBox => textBox.Text));
         }
     }
 }

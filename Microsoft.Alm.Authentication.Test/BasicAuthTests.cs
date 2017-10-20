@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Microsoft.Alm.Authentication.Test
 {
-    [TestClass]
     public class BasicAuthTests
     {
         public BasicAuthTests()
@@ -11,7 +10,7 @@ namespace Microsoft.Alm.Authentication.Test
             Trace.Listeners.AddRange(Debug.Listeners);
         }
 
-        [TestMethod]
+        [Fact]
         public void BasicAuthDeleteCredentialsTest()
         {
             TargetUri targetUri = new TargetUri("http://localhost");
@@ -19,14 +18,12 @@ namespace Microsoft.Alm.Authentication.Test
 
             basicAuth.CredentialStore.WriteCredentials(targetUri, new Credential("username", "password"));
 
-            Credential credentials;
-
             basicAuth.DeleteCredentials(targetUri);
 
-            Assert.IsFalse(basicAuth.CredentialStore.ReadCredentials(targetUri, out credentials), "User credentials were not deleted as expected");
+            Assert.Null(basicAuth.CredentialStore.ReadCredentials(targetUri));
         }
 
-        [TestMethod]
+        [Fact]
         public void BasicAuthGetCredentialsTest()
         {
             TargetUri targetUri = new TargetUri("http://localhost");
@@ -34,16 +31,16 @@ namespace Microsoft.Alm.Authentication.Test
 
             Credential credentials = null;
 
-            Assert.IsFalse(basicAuth.GetCredentials(targetUri, out credentials), "User credentials were unexpectedly retrieved.");
+            Assert.Null(credentials = basicAuth.GetCredentials(targetUri));
 
             credentials = new Credential("username", "password");
 
             basicAuth.CredentialStore.WriteCredentials(targetUri, credentials);
 
-            Assert.IsTrue(basicAuth.GetCredentials(targetUri, out credentials), "User credentials were unexpectedly not retrieved.");
+            Assert.NotNull(credentials = basicAuth.GetCredentials(targetUri));
         }
 
-        [TestMethod]
+        [Fact]
         public void BasicAuthSetCredentialsTest()
         {
             TargetUri targetUri = new TargetUri("http://localhost");
@@ -51,25 +48,24 @@ namespace Microsoft.Alm.Authentication.Test
 
             Credential credentials = null;
 
-            Assert.IsFalse(basicAuth.GetCredentials(targetUri, out credentials), "User credentials were unexpectedly retrieved.");
-            try
+            Assert.Null(credentials = basicAuth.GetCredentials(targetUri));
+            Assert.Throws<System.ArgumentNullException>(() =>
             {
                 basicAuth.SetCredentials(targetUri, credentials);
-                Assert.Fail("User credentials were unexpectedly set.");
-            }
-            catch { }
+            });
 
             credentials = new Credential("username", "password");
 
-            Assert.IsTrue(basicAuth.SetCredentials(targetUri, credentials), "User credentials were unexpectedly not set.");
-            Assert.IsTrue(basicAuth.GetCredentials(targetUri, out credentials), "User credentials were unexpectedly not retrieved.");
+            basicAuth.SetCredentials(targetUri, credentials);
+
+            Assert.NotNull(credentials = basicAuth.GetCredentials(targetUri));
         }
 
         private BasicAuthentication GetBasicAuthentication(string @namespace)
         {
             ICredentialStore credentialStore = new SecretCache(@namespace);
 
-            return new BasicAuthentication(credentialStore);
+            return new BasicAuthentication(credentialStore, NtlmSupport.Auto, null, null);
         }
     }
 }
